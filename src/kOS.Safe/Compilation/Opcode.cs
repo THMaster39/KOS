@@ -648,16 +648,18 @@ namespace kOS.Safe.Compilation
         public override void Execute(ICpu cpu)
         {
             object index = cpu.PopValue();
-            if (index is double || index is float)
-            {
-                index = Convert.ToInt32(index);  // allow expressions like (1.0) to be indexes
-            }
             object list = cpu.PopValue();
 
             object value;
 
             if (list is IIndexable)
             {
+                if (index is double || index is float)
+                {
+                    index = Convert.ToInt32(index);  // allow expressions like (1.0) to be indexes
+                }
+                if (!(index is int)) throw new Exception("The index must be an integer number");
+
                 value = ((IIndexable)list).GetIndex((int)index);
             }
             else if (list is ILexicon)
@@ -668,8 +670,6 @@ namespace kOS.Safe.Compilation
             {
                 throw new Exception(string.Format("Can't iterate on an object of type {0}", list.GetType()));
             }
-
-            if (!(index is int)) throw new Exception("The index must be an integer number");
 
             cpu.PushStack(value);
         }
@@ -694,6 +694,8 @@ namespace kOS.Safe.Compilation
                     index = Convert.ToInt32(index);  // allow expressions like (1.0) to be indexes
                 }
 
+                if (!(index is int)) throw new Exception("The index must be an integer number");
+
                 if (value != null)
                 {
                     ((IIndexable)list).SetIndex((int)index, value);
@@ -711,7 +713,6 @@ namespace kOS.Safe.Compilation
                 throw new Exception(string.Format("Can't iterate on an object of type {0}", list.GetType()));
             }
 
-            if (!(index is int)) throw new Exception("The index must be an integer number");
         }
     }
 
